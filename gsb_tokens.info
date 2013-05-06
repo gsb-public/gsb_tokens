@@ -1,0 +1,5 @@
+name = GSB Tokens
+description = Custom tokens for GSB.
+package = GSB
+core = 7.x
+dependencies[] = token
