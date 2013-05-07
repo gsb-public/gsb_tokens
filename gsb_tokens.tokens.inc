@@ -11,9 +11,9 @@
 function gsb_tokens_token_info() {
   $info = array();
 
-  $info['tokens']['array']['gsb-join-path'] = array(
-    'name' => t('Custom token for GSB'),
-    'description' => t('The array values each cleaned by Pathauto and then joined with the slash into a string that resembles an URL.'),
+  $info['tokens']['array']['parent-full-path'] = array(
+    'name' => t('Get the parent full path'),
+    'description' => t('Returns the parent menu items\' path alias.'),
   );
 
   return $info;
@@ -26,13 +26,11 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
   $replacements = array();
 
   if ($type == 'array' && !empty($data['array'])) {
-    $array = $data['array'];
-    
     foreach ($tokens as $name => $original) {
       switch ($name) {
-        case 'gsb-join-path';
-          end($array);
-          $menu_item = menu_link_load(key($array));
+        case 'parent-full-path';
+          $parent_mlid = key(array_pop($data['array']));
+          $menu_item = menu_link_load($parent_mlid);
           $replacements[$original] = drupal_get_path_alias($menu_item['link_path']);
           break;
       }
