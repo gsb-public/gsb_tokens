@@ -29,7 +29,9 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'parent-full-path';
-          $parent_mlid = key(array_pop($data['array']));
+          $array = $data['array'];
+          end($array);
+          $parent_mlid = key($array);
           $menu_item = menu_link_load($parent_mlid);
           $replacements[$original] = drupal_get_path_alias($menu_item['link_path']);
           break;
