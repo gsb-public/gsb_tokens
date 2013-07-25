@@ -29,7 +29,16 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'menu-link:parents:parent-full-path':
-          $menu = $data['node']->menu;
+          // If we don't get the menu then pull it from the database.
+          if (empty($data['node']->menu)) {
+            $menu = db_query("SELECT ml.menu_name, ml.plid from {menu_links} ml where link_path = 'node/" . $data['node']->nid . "'")->fetchAssoc();
+          }
+          else {
+            $menu = $data['node']->menu;
+          }
+
+          // If there is a parent then use the parents path as the replacement.
+          // Otherwise get the path of the menu.
           if (!empty($menu['plid'])) {
             $menu_item = menu_link_load($menu['plid']);
             $replacements[$original] = drupal_get_path_alias($menu_item['link_path']);
