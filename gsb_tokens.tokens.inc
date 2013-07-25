@@ -37,18 +37,21 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
             $menu = $data['node']->menu;
           }
 
+          // If there is no menu then use content as the replacement.
+          if (empty($menu)) {
+            $replacements[$original] = 'content';
+          }
           // If there is a parent then use the parents path as the replacement.
-          // Otherwise get the path of the menu.
-          if (!empty($menu['plid'])) {
+          elseif (!empty($menu['plid'])) {
             $menu_item = menu_link_load($menu['plid']);
             $replacements[$original] = drupal_get_path_alias($menu_item['link_path']);
           }
+          // Otherwise get the path of the menu.
           else {
             if (isset($data['node']->menu['menu_name'])) {
               $menu_name = $data['node']->menu['menu_name'];
             }
-            // If the data doesn't have the menu_name pull it straight from the
-            // database.
+            // If data doesn't have the menu_name pull it from the database.
             else {
               $menu_name = db_query("SELECT ml.menu_name from {menu_links} ml where link_path = 'node/" . $data['node']->nid . "'")->fetchField();
             }
