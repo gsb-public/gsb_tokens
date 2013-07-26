@@ -52,7 +52,7 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
           // Otherwise get the path of the menu.
           else {
             // If data doesn't have the menu_name pull it from the database.
-            if (!isset($menu['menu_name'])) { {
+            if (!isset($menu['menu_name'])) {
               $menu['menu_name'] = db_query("SELECT ml.menu_name from {menu_links} ml where link_path = 'node/" . $node->nid . "'")->fetchField();
             }
 
