@@ -29,37 +29,42 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'menu-link:parents:parent-full-path':
+          $node = $data['node'];
           // If we don't get the menu then pull it from the database.
-          if (empty($data['node']->menu)) {
-            $menu = db_query("SELECT ml.menu_name, ml.plid from {menu_links} ml where link_path = 'node/" . $data['node']->nid . "'")->fetchAssoc();
+          if (empty($node->menu)) {
+            $menu = db_query("SELECT ml.menu_name, ml.plid from {menu_links} ml where link_path = 'node/" . $node->nid . "'")->fetchAssoc();
           }
           else {
-            $menu = $data['node']->menu;
+            $menu = $node->menu;
           }
+
+          $replacement = '';
 
           // If there is no menu then use content as the replacement.
           if (empty($menu)) {
-            $replacements[$original] = 'content';
+            $replacement = 'content';
           }
           // If there is a parent then use the parents path as the replacement.
           elseif (!empty($menu['plid'])) {
             $menu_item = menu_link_load($menu['plid']);
-            $replacements[$original] = drupal_get_path_alias($menu_item['link_path']);
+            $replacement = drupal_get_path_alias($menu_item['link_path']);
           }
           // Otherwise get the path of the menu.
           else {
-            if (isset($data['node']->menu['menu_name'])) {
-              $menu_name = $data['node']->menu['menu_name'];
-            }
             // If data doesn't have the menu_name pull it from the database.
-            else {
-              $menu_name = db_query("SELECT ml.menu_name from {menu_links} ml where link_path = 'node/" . $data['node']->nid . "'")->fetchField();
+            if (!isset($menu['menu_name'])) { {
+              $menu['menu_name'] = db_query("SELECT ml.menu_name from {menu_links} ml where link_path = 'node/" . $node->nid . "'")->fetchField();
             }
-            $tid = str_replace('section-', '', $menu_name);
-            $section = taxonomy_term_load($tid);
-            $replacements[$original] = $section->field_workbench_section_path[$data['node']->language][0]['safe_value'];
+
+            // Make sure the menu is a section.
+            if (stristr($menu['menu_name'], 'section-')) {
+              $tid = str_replace('section-', '', $menu['menu_name']);
+              $section = taxonomy_term_load($tid);
+              $replacement = $section->field_workbench_section_path[$node->language][0]['safe_value'];
+            }
           }
 
+          $replacements[$original] = $replacement;
           break;
       }
     }
