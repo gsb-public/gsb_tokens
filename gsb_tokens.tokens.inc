@@ -41,7 +41,7 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
           $replacement = '';
 
           // If there is no menu then use content as the replacement.
-          if (empty($menu)) {
+          if (empty($menu['mlid'])) {
             $replacement = 'content';
           }
           // If there is a parent then use the parents path as the replacement.
