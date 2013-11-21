@@ -32,7 +32,7 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
           $node = $data['node'];
           // If we don't get the menu then pull it from the database.
           if (empty($node->menu)) {
-            $menu = db_query("SELECT ml.menu_name, ml.plid from {menu_links} ml where link_path = 'node/" . $node->nid . "'")->fetchAssoc();
+            $menu = db_query("SELECT ml.menu_name, ml.plid, ml.mlid from {menu_links} ml where link_path = 'node/" . $node->nid . "'")->fetchAssoc();
           }
           else {
             $menu = $node->menu;
