@@ -16,6 +16,16 @@ function gsb_tokens_token_info() {
     'description' => t('Returns the parent menu items\' path alias.'),
   );
 
+  $info['tokens']['current-user']['faculty-profile-url'] = array(
+    'name' => t('Faculty profile url'),
+    'description' => t('Get the url to the current users faculty profile'),
+  );
+
+  $info['tokens']['current-user']['faculty-profile-edit-url'] = array(
+    'name' => t('Faculty profile edit url'),
+    'description' => t('Get the faculty profile edit url of the current user'),
+  );
+
   return $info;
 }
 
@@ -65,6 +75,38 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
           }
 
           $replacements[$original] = $replacement;
+          break;
+      }
+    }
+  }
+
+  if ($type == 'current-user') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'faculty-profile-url':
+        case 'faculty-profile-edit-url':
+          $nid = '';
+          // Query for the faculty node this user belongs to.
+          if (field_info_instance('node', 'field_sunetid', 'faculty')) {
+            $query = new EntityFieldQuery('node');
+            $results = $query
+              ->entityCondition('bundle', 'faculty')
+              ->fieldCondition('field_sunetid', 'value', $GLOBALS['user']->name)
+              ->execute();
+            if (!empty($results['node'])) {
+              $nid = key($results['node']);
+            }
+          }
+
+          if (is_numeric($nid)) {
+            $path = 'node/' . $nid;
+            if ($name == 'faculty-profile-edit-url') {
+              $path .= '/edit';
+            }
+
+            $alias = drupal_get_path_alias($path);
+            $replacements[$original] = $alias;
+          }
           break;
       }
     }
