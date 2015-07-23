@@ -26,6 +26,11 @@ function gsb_tokens_token_info() {
     'description' => t('Get the faculty profile edit url of the current user'),
   );
 
+  $info['tokens']['node']['gsb-event-location'] = array(
+    'name' => t('Event Location With View Mode'),
+    'description' => t('Event Location with optional view mode. ex. gsb-event-location:[view-mode]'),
+  );
+
   return $info;
 }
 
@@ -36,8 +41,18 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
   $replacements = array();
 
   if ($type == 'node' && !empty($data['node'])) {
+    $node = $data['node'];
     foreach ($tokens as $name => $original) {
+      $parameters = explode(':', $name);
+      $name = array_shift($parameters);
       switch ($name) {
+        case 'gsb-event-location':
+          $pane_id = $node->field_event_location[$node->language][0]['value'];
+          $field_event_location = entity_load('field_collection_item', array($pane_id));
+          $view_mode = empty($parameters['0']) ? 'default' : $parameters[0];
+          $entity_array = entity_view('field_collection_item', $field_event_location, $view_mode);
+          $replacements[$original] = drupal_render($entity_array);
+          break;
         case 'menu-link:parents:parent-full-path':
           $node = $data['node'];
           // If we don't get the menu then pull it from the database.
