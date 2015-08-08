@@ -47,11 +47,15 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
       $name = array_shift($parameters);
       switch ($name) {
         case 'gsb-event-location':
-          $pane_id = $node->field_event_location[$node->language][0]['value'];
-          $field_event_location = entity_load('field_collection_item', array($pane_id));
-          $view_mode = empty($parameters['0']) ? 'default' : $parameters[0];
-          $entity_array = entity_view('field_collection_item', $field_event_location, $view_mode);
-          $replacements[$original] = drupal_render($entity_array);
+          $replacement = '';
+          foreach ($node->field_event_location[$node->language] as $location) {
+            $pane_id = $location['value'];
+            $field_event_location = entity_load('field_collection_item', array($pane_id));
+            $view_mode = empty($parameters['0']) ? 'default' : $parameters[0];
+            $entity_array = entity_view('field_collection_item', $field_event_location, $view_mode);
+            $replacement .= drupal_render($entity_array);
+          }
+          $replacements[$original] = $replacement;
           break;
         case 'menu-link:parents:parent-full-path':
           $node = $data['node'];
