@@ -43,8 +43,10 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
   if ($type == 'node' && !empty($data['node'])) {
     $node = $data['node'];
     foreach ($tokens as $name => $original) {
-      $parameters = explode(':', $name);
-      $name = array_shift($parameters);
+      if (stristr($name, 'gsb-event-location')) {
+        $parameters = explode(':', $name);
+        $name = array_shift($parameters);
+      }
       switch ($name) {
         case 'gsb-event-location':
           $replacement = '';
