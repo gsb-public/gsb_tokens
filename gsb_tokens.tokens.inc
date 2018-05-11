@@ -65,12 +65,10 @@ function gsb_tokens_tokens($type, $tokens, array $data = array(), array $options
           $node = $data['node'];
           // If we don't get the menu then pull it from the database.
           if (empty($node->menu)) {
-            $menu = db_query("SELECT ml.menu_name, ml.plid, ml.mlid from {menu_links} ml where link_path = 'node/" . $node->nid . "' AND menu_name <> 'navigation'")->fetchAssoc();
+            // Prepare the node for the edit form so that $node->menu always exists.
+            menu_node_prepare($node);
           }
-          else {
-            $menu = $node->menu;
-          }
-
+          $menu = $node->menu;
           $replacement = '';
 
           // If there is no menu then use content as the replacement.
